@@ -1,1 +1,1 @@
-export const Pattern = /\<tr\>.*?\<td\>.*?\<\/td\>.*?\<td\>(?<name>[a-zA-Z]{2})\<\/td\>.*?\<td\>(?<zh_Hans>.+?)\<\/td\>.*?\<td\>(?<zh_Hant>.+?)\<\/td\>.*?\<td\>.+?\<\/td\>.*?\<td\>\d+\<\/td\>.*?\<td\>(?:\d+)?\<\/td\>.*?\<\/tr\>/;
+export const Pattern = /\<tr\>.*?\<td.*?\<tt\>(?<code3>.+?)\<\/tt\>.*?\<\/td\>.*?\<td\>.*?\<span\s+class\=\"flagicon\"\>.*?\<img.*?\/\>.*?\<\/span\>.*?\<a.*?\>(?<name>.+?)\<\/a\>.*?\<\/td\>.*?\<\/tr\>/;

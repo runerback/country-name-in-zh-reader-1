@@ -1,5 +1,6 @@
 export interface Config {
-    readonly rootURL: string;
+    readonly rootURL_zh_Hans: string;
+    readonly rootURL_zh_hant: string;
     readonly cachePath: string;
 }
 
@@ -14,12 +15,12 @@ export interface LinkedData<T = any> {
 }
 
 export interface CountryNames {
-    readonly zh_hans: string;
-    readonly zh_hant: string;
+    readonly zh_hans?: string;
+    readonly zh_hant?: string;
 }
 
 export interface CountryNamesModel {
-    readonly code2: string;
+    readonly code3: string;
     readonly name_zh_Hans: string;
     readonly name_zh_Hant: string;
 }

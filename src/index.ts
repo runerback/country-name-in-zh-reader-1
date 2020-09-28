@@ -16,7 +16,7 @@ read()
     .catch((error: Error) => console.error(error));
 
 function readConfig(): Config {
-    const { rootURL, cachePath } = (<Config>JSON.parse(fs.readFileSync(
+    const { rootURL_zh_Hans, rootURL_zh_hant, cachePath } = (<Config>JSON.parse(fs.readFileSync(
         path.resolve('./config.json'),
         'utf-8')));
 
@@ -26,7 +26,8 @@ function readConfig(): Config {
     }
 
     return {
-        rootURL: rootURL,
+        rootURL_zh_Hans,
+        rootURL_zh_hant,
         cachePath: safeCachePath
     };
 }
@@ -34,29 +35,57 @@ function readConfig(): Config {
 async function read(): Promise<CountryNamesModel[]> {
     const config = readConfig();
 
-    const namesSet = Array<CountryNamesModel>();
+    const namesMap = new Map<string, CountryNames>();
 
-    const rootHtml = await request(config.rootURL, config);
-
-    for (const linkedData of iterator(rootHtml, config)) {
-        namesSet.push({
-            code2: linkedData.name,
-            name_zh_Hans: linkedData.data!.zh_hans,
-            name_zh_Hant: linkedData.data!.zh_hant
+    const rootHtml_zh_hans = await request(config.rootURL_zh_Hans, config);
+    for (const linkedData of iterator_zh_Hans(rootHtml_zh_hans, config)) {
+        namesMap.set(linkedData.name, {
+            zh_hans: linkedData.data!.zh_hans!
         });
     }
 
-    return namesSet;
+    const rootHtml_zh_hant = await request(config.rootURL_zh_hant, config);
+    for (const linkedData of iterator_zh_Hant(rootHtml_zh_hant, config)) {
+        const code3 = linkedData.name;
+
+        if (namesMap.has(code3)) {
+            namesMap.set(code3, {
+                ...namesMap.get(code3),
+                zh_hant: linkedData.data!.zh_hant!
+            });
+        } else {
+            namesMap.set(code3, {
+                zh_hant: linkedData.data!.zh_hant!
+            });
+        }
+    }
+
+    return [...namesMap.entries()].map(([k, v]) => ({
+        code3: k,
+        name_zh_Hans: v.zh_hans ?? '',
+        name_zh_Hant: v.zh_hant ?? ''
+    }));
 }
 
-function* iterator(html: string, config: Config): IterableIterator<LinkedData<CountryNames>> {
+function* iterator_zh_Hans(html: string, config: Config): IterableIterator<LinkedData<CountryNames>> {
     for (const group of matches(Pattern, ['g', 'i', 's'], html)) {
         yield {
-            name: group['name'].valueOf(),
+            name: group['code3'].valueOf(),
             url: '',
             data: {
-                zh_hans: group['zh_Hans'].valueOf(),
-                zh_hant: group['zh_Hant'].valueOf()
+                zh_hans: group['name'].valueOf()
+            }
+        };
+    }
+}
+
+function* iterator_zh_Hant(html: string, config: Config): IterableIterator<LinkedData<CountryNames>> {
+    for (const group of matches(Pattern, ['g', 'i', 's'], html)) {
+        yield {
+            name: group['code3'].valueOf(),
+            url: '',
+            data: {
+                zh_hant: group['name'].valueOf()
             }
         };
     }
