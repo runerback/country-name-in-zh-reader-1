@@ -1,7 +1,8 @@
 export interface Config {
     readonly rootURL_zh_Hans: string;
     readonly rootURL_zh_hant: string;
-    readonly cachePath: string;
+    readonly cachePath: string; // cache folder
+    readonly output: string; // output file name
 }
 
 export interface MatchGroups {

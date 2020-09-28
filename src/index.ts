@@ -5,10 +5,12 @@ import fs from 'fs';
 import path from 'path';
 import { Pattern } from './patterns';
 
-read()
+const _config = readConfig();
+
+read(_config)
     .then((data: CountryNamesModel[]) => {
         fs.writeFileSync(
-            path.resolve('./countrynames.json'),
+            _config.output,
             JSON.stringify(data, null, '  ')
         );
         console.log('done');
@@ -16,7 +18,7 @@ read()
     .catch((error: Error) => console.error(error));
 
 function readConfig(): Config {
-    const { rootURL_zh_Hans, rootURL_zh_hant, cachePath } = (<Config>JSON.parse(fs.readFileSync(
+    const { rootURL_zh_Hans, rootURL_zh_hant, cachePath, output } = (<Config>JSON.parse(fs.readFileSync(
         path.resolve('./config.json'),
         'utf-8')));
 
@@ -28,13 +30,12 @@ function readConfig(): Config {
     return {
         rootURL_zh_Hans,
         rootURL_zh_hant,
-        cachePath: safeCachePath
+        cachePath: safeCachePath,
+        output: path.resolve(output)
     };
 }
 
-async function read(): Promise<CountryNamesModel[]> {
-    const config = readConfig();
-
+async function read(config: Config): Promise<CountryNamesModel[]> {
     const namesMap = new Map<string, CountryNames>();
 
     const rootHtml_zh_hans = await request(config.rootURL_zh_Hans, config);

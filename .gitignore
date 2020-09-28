@@ -3,4 +3,4 @@
 **/*.log
 **/yarn.*
 **/cached
-**/countrynames.json
+**/countrynames_zh.json
